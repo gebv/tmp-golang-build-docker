@@ -7,13 +7,10 @@ FROM golang:1.14 AS vendor
 
 FROM vendor as builder
     WORKDIR /go/src/github.com/gebv/tmp-golang-build-docker
-    COPY --from=vendor /root/.cache/go-build /root/.cache/go-build
     COPY --from=vendor /go/pkg/mod /go/pkg/mod
     COPY . .
 
-    RUN echo "before build"
     RUN CGO_ENABLED=0 go build -v -o ./bin/app ./cmd/main.go
-    RUN echo "after build"
 
 FROM alpine:3.11 as app
     WORKDIR /

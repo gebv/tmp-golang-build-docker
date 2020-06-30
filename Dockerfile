@@ -1,8 +1,13 @@
-FROM golang:1.14 as builder
+FROM golang:1.14 AS vendor
     WORKDIR /go/src/github.com/gebv/tmp-golang-build-docker
     COPY go.mod .
     COPY go.sum .
     RUN go mod download
+
+FROM vendor as builder
+    WORKDIR /go/src/github.com/gebv/tmp-golang-build-docker
+    COPY --from=vendor $GOCACHE $GOCACHE
+    COPY --from=vendor $GOPATH/pkg/mod $GOPATH/pkg/mod
     COPY . .
 
     RUN go build -v -race -o ./bin/app ./cmd/main.go

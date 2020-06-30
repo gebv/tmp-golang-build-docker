@@ -19,5 +19,5 @@ func main() {
 
 	i := viper.GetInt("flagname") // retrieve value from viper
 
-	log.Println("Flag value", i)
+	log.Println("Flag value 2", i)
 }

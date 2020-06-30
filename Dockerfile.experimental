@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:experimental
+
 FROM golang:1.14 AS vendor
     WORKDIR /go/src/github.com/gebv/tmp-golang-build-docker
     COPY go.mod .
@@ -12,10 +14,12 @@ FROM vendor as builder
     COPY . .
 
     RUN echo "before build"
-    RUN CGO_ENABLED=0 go build -v -o ./bin/app ./cmd/main.go
+    RUN --mount=type=cache,target=/go/pkg/mod \
+        --mount=type=cache,target=/root/.cache/go-build \
+        CGO_ENABLED=0 go build -v -o ./bin/app ./cmd/main.go
     RUN echo "after build"
 
 FROM alpine:3.11 as app
     WORKDIR /
     COPY --from=builder /go/src/github.com/gebv/tmp-golang-build-docker/bin/app .
-    ENTRYPOINT /app --flagname=build
+    ENTRYPOINT /app --flagname=build-experimental

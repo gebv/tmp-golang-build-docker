@@ -35,8 +35,19 @@ build-manual-cache:
 
 	docker run --rm -it gebv/tmp-golang-build-docker:build-manual-cache
 
+build-manual-cache2:
+	cat ./cmd/main.go.tpl | sed "s/{dynamic_value}/`date -u +%Y-%m-%dT%H:%M:%S`/g" > ./cmd/main.go
 
-test: build-experimental build build-manual-cache
+	time docker build \
+		--progress plain \
+		-t gebv/tmp-golang-build-docker:build-manual-cache2 \
+		-f ./Dockerfile.manualcache2 \
+		--target app \
+		.
+
+	docker run --rm -it gebv/tmp-golang-build-docker:build-manual-cache2
+
+test: build-experimental build build-manual-cache build-manual-cache2
 
 demo:
 	make test 2>&1 | grep -C 2 real

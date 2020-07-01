@@ -7,7 +7,8 @@ FROM golang:1.14 AS vendor
 
 FROM vendor as builder
     WORKDIR /go/src/github.com/gebv/tmp-golang-build-docker
-    COPY --from=vendor /go/pkg/mod /go/pkg/mod
+    COPY --from=vendor /go/pkg /go/pkg
+    COPY --from=vendor /root/.cache/go-build /root/.cache/go-build
     COPY . .
 
     RUN CGO_ENABLED=0 go build -v -o ./bin/app ./cmd/main.go

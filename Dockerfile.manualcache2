@@ -3,11 +3,12 @@ FROM golang:1.14 AS vendor
     COPY go.mod .
     COPY go.sum .
     RUN go mod download
-    RUN echo "package main\n\n" > cache.go
+#    RUN echo "package main\n\n" > cache.go
 #	RUN go mod graph | grep -v '@.*@' | cut -d ' ' -f 2 | cut -f1 -d"@" | awk '{ print "import _ \""$0"\""}' >> cache.go
-	RUN go list -f '{{range $imp := .Imports}}{{printf "%s\n" $imp}}{{end}}' ./... | awk '{ print "import _ \""$0"\""}' >> cache.go
+#	RUN go list -f '{{range $imp := .Imports}}{{printf "%s\n" $imp}}{{end}}' ./... | awk '{ print "import _ \""$0"\""}' >> cache.go
 # 	RUN echo "\n\nfunc main() {}" >> cache.go
-    RUN go build cache.go
+#    RUN go build cache.go
+    RUN go mod graph | awk '{if ($1 !~ "@") print $2}' | xargs go get
     RUN ls -lha /root/.cache/go-build
     RUN go env
 
